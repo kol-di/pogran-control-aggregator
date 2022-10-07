@@ -13,7 +13,7 @@ from telethon.tl.functions.messages import GetHistoryRequest
 
 from parser import get_msg_chunk
 
-from db_locations import initialize_db
+from db_locations import MongodbService
 
 # enable logging
 logging.basicConfig(
@@ -35,7 +35,7 @@ client = TelegramClient(USERNAME, API_ID, API_HASH)
 client.start()
 
 
-async def _dump_all_messages(channel, collection):
+async def _dump_all_messages(channel):
     """Creates JSON with all channel messages"""
     limit_msg = 100  # message limit per api call
     offset_min = 0
@@ -75,13 +75,14 @@ async def _dump_all_messages(channel, collection):
         if total_count_limit != 0 and total_messages >= total_count_limit:
             break
 
-    collection.insert_many(all_messages)
+    db = MongodbService.get_instance()
+    db.save_many(all_messages)
 
     with open('channel_messages.json', 'w', encoding='utf8') as outfile:
         json.dump(all_messages, outfile, ensure_ascii=False, cls=DateTimeEncoder)
 
 
-def _pars_args(argv):
+def parse_args(argv):
     arg_rewrite = ''
     arg_help = "{0} -r <rewrite>".format(argv[0])
 
@@ -105,27 +106,27 @@ def _pars_args(argv):
 async def main(argv):
     channel_peer = await client.get_entity(CHANNEL_URL)
 
-    db = initialize_db()
-
-    arg_rewrite = _pars_args(argv)
+    arg_rewrite = parse_args(argv)
     if arg_rewrite == 'y':
-        await _dump_all_messages(channel_peer, db['locations'])
+        await _dump_all_messages(channel_peer)
 
-    return channel_peer, db
+    return channel_peer
 
 
-channel_peer, db = client.loop.run_until_complete(main(sys.argv))
+channel_peer = client.loop.run_until_complete(main(sys.argv))
 
 
 @client.on(events.NewMessage(chats=[channel_peer]))
 async def handler(event):
     text = event.message
     msg_chunk = get_msg_chunk(text)
-    db['locations'].insert_many(msg_chunk)
+    db = MongodbService.get_instance()
+    db.save_many(msg_chunk)
+    print(db.get_data())
 
 
 print(f'Is bot? {client.is_bot()}')
 print(f'Is authorized? {client.is_user_authorized()}')
 
 client.run_until_disconnected()
-db.close()
+MongodbService.close_connection()
