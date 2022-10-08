@@ -9,6 +9,8 @@ RUN pip install --upgrade pip
 COPY ./requirements.txt /usr/src/app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY __init__.py config.ini main.py parser.py ./
+COPY __init__.py config.ini main.py parser.py db_locations.py ./
 
-CMD python main.py -r y
+#EXPOSE 27017
+
+CMD python main.py -r n
