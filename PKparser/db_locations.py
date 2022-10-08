@@ -1,16 +1,8 @@
-import configparser
-import pathlib
-
 from pymongo import MongoClient
 
 
-# read sensitive configs
-config_path = pathlib.Path(__file__).parent.absolute() / "config.ini"
-config = configparser.ConfigParser()
-config.read(config_path)
-
-# ATLAS_URI = config['Mongo']['atlas_uri']
-DB_NAME = config['Mongo']['db_name']
+MONGODB_HOST = 'mongodb_service'    # matches service name in docker-compose
+DB_NAME = 'pk_db'   # matches db name in docker-compose
 
 
 class MongodbService:
@@ -32,14 +24,13 @@ class MongodbService:
         cls._clinet.close()
 
     def __init__(self):
-        self._clinet = MongoClient('localhost', 27017)
+        self._clinet = MongoClient(MONGODB_HOST, 27017)
         self._db = self._clinet[DB_NAME]
 
     def save_many(self, data):
         return self._db.locations.insert_many(data)
 
     def get_data(self):
-        print(self._instance, self._clinet, self._db)
         return list(self._db.locations.find({}))
 
     def drop(self):

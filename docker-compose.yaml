@@ -1,0 +1,30 @@
+version: "3"
+
+volumes:
+  mongodb_volume:
+
+services:
+  tg_scraper:
+    build: PKparser/
+    restart: always
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    depends_on:
+      - mongodb_service
+    networks:
+      - lognet
+
+  mongodb_service:
+    image: mongo:latest
+    volumes:
+      - mongodb_volume:/data/db
+    restart: always
+    command: mongod --quiet --logpath /dev/null
+    environment:
+      MONGO_INITDB_DATABASE: pk_db
+    networks:
+      - lognet
+
+networks:
+  lognet:
+    driver: bridge
