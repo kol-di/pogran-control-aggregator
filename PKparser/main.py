@@ -4,7 +4,6 @@ import pathlib
 import logging
 import sys
 import getopt
-import os
 
 from datetime import datetime
 
@@ -14,11 +13,7 @@ from telethon.tl.functions.messages import GetHistoryRequest
 
 from parser import get_msg_chunk
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
-
-from PKdb.db_locations import MongodbService
-
+from db_locations import MongodbService
 
 # enable logging
 logging.basicConfig(
@@ -40,7 +35,7 @@ client = TelegramClient(USERNAME, API_ID, API_HASH)
 client.start()
 
 
-async def dump_all_messages(channel):
+async def _dump_all_messages(channel):
     """Creates JSON with all channel messages"""
     limit_msg = 100  # message limit per api call
     offset_min = 0
@@ -108,29 +103,17 @@ def parse_args(argv):
     return arg_rewrite
 
 
-async def main():
+async def main(argv):
     channel_peer = await client.get_entity(CHANNEL_URL)
-    # ask if to clean db contents. If user chooses to download all history, then cleaning db is adviced.
 
-    print('Do you want to rewrite existing database records [y]'
-          ' or to keep adding new records to the old ones [n]?')
-    while True:
-        rewrite_inp = input().lower()
-        if rewrite_inp in ('y', 'yes', 'n', 'no'):
-            rewrite = rewrite_inp in ('y', 'yes')
-            break
-
-    # arg_rewrite = parse_args(argv)
-    if rewrite:
-        db = MongodbService.get_instance()
-        db.drop()
-        await dump_all_messages(channel_peer)
+    arg_rewrite = parse_args(argv)
+    if arg_rewrite == 'y':
+        await _dump_all_messages(channel_peer)
 
     return channel_peer
 
 
-# channel_peer = client.loop.run_until_complete(main(sys.argv))
-channel_peer = client.loop.run_until_complete(main())
+channel_peer = client.loop.run_until_complete(main(sys.argv))
 
 
 @client.on(events.NewMessage(chats=[channel_peer]))
