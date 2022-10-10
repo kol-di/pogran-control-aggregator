@@ -1,7 +1,10 @@
 from pymongo import MongoClient
 
+import os
 
-MONGODB_HOST = 'mongodb_service'    # matches service name in docker-compose
+DEBUG = os.getenv("DEBUG") == 'True'
+
+MONGODB_HOST = 'localhost' if DEBUG else 'mongodb_service'    # matches service name in docker-compose
 DB_NAME = 'pk_db'   # matches db name in docker-compose
 
 
