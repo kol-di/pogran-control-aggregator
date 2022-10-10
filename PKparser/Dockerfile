@@ -6,11 +6,17 @@ WORKDIR usr/src/app
 ENV PYTHONUNBUFFERED 1
 
 RUN pip install --upgrade pip
-COPY ./requirements.txt /usr/src/app/requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
 
-COPY __init__.py config.ini main.py parser.py db_locations.py ./
+COPY ./PKparser/requirements.txt /usr/src/app/requirements.txt
+RUN pip install --no-cache-dir -r ./requirements.txt
 
-#EXPOSE 27017
+COPY ./PKparser/__init__.py \
+    ./PKparser/config.ini \
+    ./PKparser/main.py \
+    ./PKparser/parser.py \
+    ./PKparser/
+COPY ./PKdb/db_locations.py \
+    ./PKdb/__init__.py \
+    ./PKdb/
 
-CMD python main.py -r n
+CMD python ./PKparser/main.py
