@@ -38,3 +38,12 @@ class MongodbService:
 
     def drop(self):
         self._db.locations.drop()
+
+    def filter(self, locations=None, transport=None, date_from=None, date_to=None):
+        query_locs = {"locations": {"$in": locations}} if locations else {}
+        query_transport = {"transport": {"$in": transport}} if transport else {}
+        query_date_from = {"date": {"$gte": date_from}} if date_from else {}
+        query_date_to = {"date": {"$lte": date_to}} if date_to else {}
+        return list(self._db.locations.find({"$and": [query_locs, query_transport, query_date_from, query_date_to]}))
+
+

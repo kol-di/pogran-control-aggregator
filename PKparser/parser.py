@@ -4,7 +4,17 @@ from string import ascii_lowercase
 
 
 def parse_tags(text):
-    locations = []
+    tags = []
+
+    transport_tags = [
+        'авто',
+        'жд',
+        'авиа',
+        'самолет',
+        'автобус',
+        'аэропорт'
+    ]
+    refuse_tag = 'отказ'
 
     sent_pattern = re.compile(r"#(.*?)($|\.)", re.DOTALL)
     matches = re.finditer(sent_pattern, text)
@@ -12,10 +22,15 @@ def parse_tags(text):
     hashtag_pattern = re.compile(r"(?<=#)(.*?)(?=\s)")
     for match in matches:
         hashtags = re.findall(hashtag_pattern, clean(match.group(0), to_ascii=False, no_emoji=True))
-        refuse_and_locs = ('отказ' in hashtags, hashtags)
-        locations.append(refuse_and_locs)
+        if refuse := refuse_tag in hashtags:
+            hashtags.remove(refuse_tag)
+        transport = [var for var in hashtags if var in transport_tags]
+        for var in transport:
+            hashtags.remove(var)
+        tag_tuple = (refuse, transport, hashtags)
+        tags.append(tag_tuple)
 
-    return locations
+    return tags
 
 
 def get_msg_chunk(message):
@@ -28,16 +43,18 @@ def get_msg_chunk(message):
     serialized_msg = dict(filter(lambda el: el[0] in fields, message.to_dict().items()))
     try:
         msg_id, msg_txt, msg_date = [serialized_msg[key] for key in fields]
-        location_tags = parse_tags(msg_txt)
+        tags = parse_tags(msg_txt)
         msg_chunk = [{
             '_id': str(msg_id) + loc_id,
             'date': msg_date,
             'refused': refused,
-            'tags': tags}
-            for loc_id, refused, tags in zip(
-                ascii_lowercase[:len(location_tags)],
-                map(lambda x: x[0], location_tags),
-                map(lambda x: x[1], location_tags))]
+            'transport': transport,
+            'locations': locations}
+            for loc_id, refused, transport, locations in zip(
+                ascii_lowercase[:len(tags)],
+                map(lambda x: x[0], tags),
+                map(lambda x: x[1], tags),
+                map(lambda x: x[2], tags))]
     except KeyError:
         pass
 
