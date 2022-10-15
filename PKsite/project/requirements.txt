@@ -1,0 +1,6 @@
+django_plotly_dash==2.0.0
+dash==2.6.2
+Django==3.2.16
+pandas==1.4.4
+plotly==5.10.0
+pymongo==4.2.0

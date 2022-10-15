@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% load plotly_dash %}
+
+{% block title%}
+    Info Timeline
+{% endblock %}
+
+{% block contents%}
+    <div class="text-center mt-5">
+        <h1>Timeline</h1>
+    </div>
+    {% plotly_app name="timeline" ratio=1%}
+{% endblock %}

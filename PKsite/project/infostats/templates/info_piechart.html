@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% load plotly_dash %}
+
+{% block title%}
+    Info Piechart
+{% endblock %}
+
+{% block contents%}
+    <div class="text-center mt-5">
+        <h1>Piechart</h1>
+    </div>
+    {% plotly_app name="piechart" ratio=1%}
+{% endblock %}

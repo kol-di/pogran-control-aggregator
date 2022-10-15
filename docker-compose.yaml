@@ -5,7 +5,9 @@ volumes:
 
 services:
   tg_scraper:
-    build: PKparser/
+    build:
+      context: .
+      dockerfile: ./PKparser/Dockerfile
     restart: always
     stdin_open: true # docker run -i
     tty: true        # docker run -t
@@ -22,6 +24,8 @@ services:
     command: mongod --quiet --logpath /dev/null
     environment:
       MONGO_INITDB_DATABASE: pk_db
+    ports:
+      - 27017:27017
     networks:
       - lognet
 
