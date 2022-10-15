@@ -57,3 +57,6 @@ sample_text.txt
 
 # Logs
 *.log
+
+# Databases
+*.sqlite3

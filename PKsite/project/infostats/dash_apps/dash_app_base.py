@@ -2,7 +2,6 @@ from dash import html, dcc
 import pandas as pd
 from itertools import chain
 from datetime import date, timedelta
-from collections import defaultdict
 
 from PKdb.db_locations import MongodbService
 

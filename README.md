@@ -1,4 +1,4 @@
-To run application on your local machine:
+**To run application on your local machine:**
 1) Create ./PKparser/config.ini file with following contents
     ```Git config
    [Telegram]
@@ -15,3 +15,15 @@ To run application on your local machine:
    from the root directory
 3) Enter phone number for your telegram account and access code, when asked.
 Bot token would not suffice!
+4) Install requirements for PKsite in PKsite/project/reuirements.txt
+You might want to do that in venv.
+5) Run
+   ```
+   python PKsite/project/manage.py runserver
+   ```
+6) Go to http://127.0.0.1:8000/ to access the website. 
+
+**Dashboard examples:**
+![plot](./presentation/timeline.png)
+![plot](./presentation/piechart.png)
+![plot](./presentation/dynamics.png)
