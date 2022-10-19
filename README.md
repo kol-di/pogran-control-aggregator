@@ -1,3 +1,6 @@
+This project is designed to monitor the chances to pass Russain borders. It fetches data from the
+«Пограничный контроль» telegram channel in real time and presents it via dashboards on the website. Telegram scraper and website instance are run separately as a mean of scalability
+
 **To run application on your local machine:**
 1) Create ./PKparser/config.ini file with following contents
     ```Git config
